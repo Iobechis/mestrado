@@ -1,0 +1,35 @@
+---
+title: "vazão"
+author: "Ignazio Bechis"
+date: "20/03/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+#dados <- read_excel("C:/Users/USER/Desktop/mestrado/dados.xlsx") 
+# como ja tinha os dados num excel na maquina eu so ri o arquivo
+
+mean(x = dados$vazão)
+# resultado 2051.706
+sd(x = dados$vazão)
+# resultado  1388.059
+install.packages("e1071")
+
+library(e1071)
+
+kurtosis(x = dados$vazão)
+# resultado  3.085538
+skewness(x = dados$vazão)
+# resultado  1.657404
