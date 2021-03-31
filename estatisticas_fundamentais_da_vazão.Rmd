@@ -1,0 +1,71 @@
+---
+title: "calculo das 7 estatisticas fundamentais da vazão diária  (FDSS)"
+author: "Ignazio Bechis"
+date: "30/03/2021"
+output: html_document
+---
+
+```{r}
+#Carregar pacotes
+pacotes <- c(
+   "HEobs",
+   "tidyverse",
+   "raster",
+   "rio"
+)
+easypackages::libraries(pacotes)
+#install.packages("EflowStats")
+#install.packages("dataRetrieval")
+
+library("EflowStats")#Calcula estatísticas do indicador hidrológico e propriedades fundamentais do vazão diária 
+library(dataRetrieval)
+
+```
+
+```{r}
+#Baixar e importar/exportar dados de vazão
+data_link <- "https://www.dropbox.com/s/d40adhw66uwueet/VazoesNaturaisONS_D_87UHEsDirceuAssis_2018.dat?dl=1"
+qnat_meta <- extract_metadata(
+   data_link,
+   informative = TRUE
+)
+qnat <- import_qnat(
+   data_link,
+   complete = TRUE,
+   add_stn = TRUE
+)
+#glimpse(qnat)
+
+
+# definindo o intervalo de analise 
+dailyQ <- readNWISdv(siteNumber = "04085427",
+parameterCd = "00060",
+startDate = "2000-10-01",
+endDate = "2012-9-30")
+
+#Verificando se os dados estão completos
+dailyQClean <- validate_data(dailyQ[c("Date","X_00060_00003")],yearType="water")
+
+#Calculando área de drenagem
+siteInfo <- readNWISsite(siteNumber = "04085427")
+drainageArea <- siteInfo$drain_area_va
+
+ 
+peakFlows <- readNWISpeak(siteNumber = "04085427",
+startDate = "2000-10-01",
+endDate = "2012-9-30")
+
+floodThresh <- get_peakThreshold(dailyQClean[c("date","discharge")],
+peakFlows[c("peak_dt","peak_va")])
+
+
+#Calcule todas as estatísticas 
+calc_allHITOut <- calc_allHIT(dailyQClean,
+drainArea=drainageArea,
+floodThreshold=floodThresh)
+#Calcular 7 estatísticas 
+magnifStatsOut <- calc_magnifSeven(dailyQClean,yearType="water",digits=3)
+
+glimpse(magnifStatsOut)
+
+
